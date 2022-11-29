@@ -5,14 +5,14 @@ const connection = require("../db/connection");
 //Adding Volunteer
 router.post("/createVolunteer", (req, res) => {
   // console.log(req.body);
-  const { name, branch, city } = req.body;
+  const { name, branch, city, email, department } = req.body;
   if (!name || !branch || !city) {
     res.status(422).json("plz fill all data");
   }
   try {
     connection.query(
       "INSERT INTO Volunteer SET ?",
-      { name, branch, city },
+      { name, branch, city, email, department },
       (err, result) => {
         if (err) {
           console.log("err" + err);
@@ -28,7 +28,6 @@ router.post("/createVolunteer", (req, res) => {
 
 //Adding Department
 router.post("/createDepartment", (req, res) => {
-  // console.log(req.body);
   const { name, budget } = req.body;
   if (!name || !budget) {
     res.status(422).json("plz fill all data");
@@ -95,14 +94,14 @@ router.post("/createEvent", (req, res) => {
 //Adding Player
 router.post("/addPlayer", (req, res) => {
   // console.log(req.body);
-  const { name, plays, clg_Name, age, team } = req.body;
-  // if(!name|| ! playes|| ! venue|| ! minSquadSize|| ! maxSquadSize|| !event_desc|| !img|| !type){
-  //     res.status(422).json("plz fill all data");
-  // }
+  const { name, plays, phone, clg_Name, age, team } = req.body;
+  if (!name || !plays || !phone || !clg_Name || !age || !team) {
+    res.status(422).json("plz fill all data");
+  }
   try {
     connection.query(
       "INSERT INTO Player SET ?",
-      { name, plays, clg_Name, age, team },
+      { name, plays, phone, clg_Name, age, team },
       (err, result) => {
         if (err) {
           console.log("err" + err);
@@ -253,6 +252,41 @@ router.delete("/deletePlayer/:id", (req, res) => {
       }
     }
   );
+});
+
+router.patch("/logOut", (req, res) => {
+  connection.query(
+    "UPDATE LoggedIN SET status = no  WHERE id = 1",
+    (err, result) => {
+      if (err) {
+        res.status(422).json({ message: "error" });
+      } else {
+        res.status(201).json(result);
+      }
+    }
+  );
+});
+router.patch("/logIn", (req, res) => {
+  connection.query(
+    "UPDATE LoggedIN SET status = yes  WHERE id = 1",
+    (err, result) => {
+      if (err) {
+        res.status(422).json({ message: "error" });
+      } else {
+        res.status(201).json(result);
+      }
+    }
+  );
+});
+
+router.get("/getStatus", (req, res) => {
+  connection.query("SELECT * FROM LoggedIN WHERE id = 1", (err, result) => {
+    if (err) {
+      res.status(422).json("error");
+    } else {
+      res.status(201).json(result);
+    }
+  });
 });
 
 //Get Individual Department
